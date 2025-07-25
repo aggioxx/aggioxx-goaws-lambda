@@ -1,7 +1,7 @@
 package adapter
 
 import (
-	"awesomeProject1/domain/model"
+	"awesomeProject1/internal/domain/model"
 	"context"
 	"encoding/json"
 	"github.com/aws/aws-sdk-go-v2/aws"
