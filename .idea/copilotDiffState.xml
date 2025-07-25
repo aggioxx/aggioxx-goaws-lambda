@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/Dockerfile">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/Dockerfile" />
+              <option name="originalContent" value="# syntax=docker/dockerfile:1&#10;FROM golang:1.24 as builder&#10;WORKDIR /app&#10;COPY go.mod go.sum ./&#10;RUN go mod download&#10;COPY . .&#10;RUN CGO_ENABLED=0 GOOS=linux go build -o main main.go&#10;&#10;FROM public.ecr.aws/lambda/go:1&#10;COPY --from=builder /app/main /var/task/main&#10;CMD [&quot;main&quot;]&#10;" />
+              <option name="updatedContent" value="# syntax=docker/dockerfile:1&#10;FROM golang:1.24 as builder&#10;WORKDIR /app&#10;COPY go.mod go.sum ./&#10;RUN go mod download&#10;COPY . .&#10;RUN CGO_ENABLED=0 GOOS=linux go build -o main main.go&#10;&#10;FROM public.ecr.aws/lambda/go:1&#10;COPY --from=builder /app/main /var/task/main&#10;CMD [&quot;main&quot;]" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/Dockerfile">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/Dockerfile" />
+              <option name="originalContent" value="# syntax=docker/dockerfile:1&#10;FROM golang:1.24 as builder&#10;WORKDIR /app&#10;COPY go.mod go.sum ./&#10;RUN go mod download&#10;COPY .. .&#10;RUN CGO_ENABLED=0 GOOS=linux go build -o main main.go&#10;&#10;FROM public.ecr.aws/lambda/go:1&#10;COPY --from=builder /app/main /var/task/main&#10;CMD [&quot;main&quot;]&#10;" />
+              <option name="updatedContent" value="# syntax=docker/dockerfile:1&#10;FROM --platform=linux/amd64 golang:1.24 as builder&#10;WORKDIR /app&#10;COPY go.mod go.sum ./&#10;RUN go mod download&#10;COPY .. .&#10;RUN CGO_ENABLED=0 GOOS=linux go build -o main main.go&#10;&#10;FROM --platform=linux/amd64 public.ecr.aws/lambda/go:1&#10;COPY --from=builder /app/main /var/task/main&#10;CMD [&quot;main&quot;]" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/application/event_service.go">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/application/event_service.go" />
+              <option name="updatedContent" value="package application&#10;&#10;import (&#10;&#9;&quot;awesomeProject1/app/domain&quot;&#10;&#9;&quot;awesomeProject1/app/infrastructure&quot;&#10;&#9;&quot;time&quot;&#10;)&#10;&#10;type EventService struct {&#10;&#9;SNSPublisher infrastructure.SNSPublisher&#10;}&#10;&#10;func (s *EventService) ProcessAndPublishEvent(payload map[string]interface{}) error {&#10;&#9;// Add processing logic (e.g., add timestamp)&#10;&#9;event := domain.Event{&#10;&#9;&#9;ID:          &quot;unique-id&quot;, // Replace with actual ID generation logic&#10;&#9;&#9;Payload:     payload,&#10;&#9;&#9;ProcessedAt: time.Now().Format(time.RFC3339),&#10;&#9;}&#10;&#10;&#9;// Publish to SNS&#10;&#9;return s.SNSPublisher.Publish(event)&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/domain/event.go">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/domain/event.go" />
+              <option name="updatedContent" value="package domain&#10;&#10;type Event struct {&#10;&#9;ID          string                 `json:&quot;id&quot;`&#10;&#9;Payload     map[string]interface{} `json:&quot;payload&quot;`&#10;&#9;ProcessedAt string                 `json:&quot;processed_at&quot;`&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/infrastructure/sns_publisher.go">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/infrastructure/sns_publisher.go" />
+              <option name="updatedContent" value="package infrastructure&#10;&#10;import (&#10;&#9;&quot;awesomeProject1/app/domain&quot;&#10;&#9;&quot;context&quot;&#10;&#9;&quot;encoding/json&quot;&#10;&#9;&quot;github.com/aws/aws-sdk-go-v2/aws&quot;&#10;&#9;&quot;github.com/aws/aws-sdk-go-v2/service/sns&quot;&#10;)&#10;&#10;type SNSPublisher struct {&#10;&#9;Client   *sns.Client&#10;&#9;TopicArn string&#10;}&#10;&#10;func (p *SNSPublisher) Publish(event domain.Event) error {&#10;&#9;message, err := json.Marshal(event)&#10;&#9;if err != nil {&#10;&#9;&#9;return err&#10;&#9;}&#10;&#10;&#9;_, err = p.Client.Publish(context.TODO(), &amp;sns.PublishInput{&#10;&#9;&#9;Message:  aws.String(string(message)),&#10;&#9;&#9;TopicArn: aws.String(p.TopicArn),&#10;&#9;})&#10;&#9;return err&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/main.go">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/main.go" />
+              <option name="originalContent" value="package main&#10;&#10;import (&#10;&#9;&quot;encoding/json&quot;&#10;&#9;&quot;github.com/aws/aws-lambda-go/events&quot;&#10;&#9;&quot;github.com/aws/aws-lambda-go/lambda&quot;&#10;)&#10;&#10;func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {&#10;&#9;if request.HTTPMethod == &quot;POST&quot; &amp;&amp; request.Path == &quot;/callbacks-trackingagrovarejo/v1/eventos_operacao&quot; {&#10;&#9;&#9;var body map[string]interface{}&#10;&#9;&#9;err := json.Unmarshal([]byte(request.Body), &amp;body)&#10;&#9;&#9;if err != nil {&#10;&#9;&#9;&#9;return events.APIGatewayProxyResponse{&#10;&#9;&#9;&#9;&#9;StatusCode: 400,&#10;&#9;&#9;&#9;&#9;Headers:    map[string]string{&quot;Content-Type&quot;: &quot;application/json&quot;},&#10;&#9;&#9;&#9;&#9;Body:       `{&quot;error&quot;: &quot;` + err.Error() + `&quot;}`,&#10;&#9;&#9;&#9;}, nil&#10;&#9;&#9;}&#10;&#9;&#9;responseBody, _ := json.Marshal(map[string]interface{}{&#10;&#9;&#9;&#9;&quot;message&quot;:  &quot;Event received successfully&quot;,&#10;&#9;&#9;&#9;&quot;received&quot;: body,&#10;&#9;&#9;})&#10;&#9;&#9;return events.APIGatewayProxyResponse{&#10;&#9;&#9;&#9;StatusCode: 200,&#10;&#9;&#9;&#9;Headers:    map[string]string{&quot;Content-Type&quot;: &quot;application/json&quot;},&#10;&#9;&#9;&#9;Body:       string(responseBody),&#10;&#9;&#9;}, nil&#10;&#9;}&#10;&#9;return events.APIGatewayProxyResponse{&#10;&#9;&#9;StatusCode: 404,&#10;&#9;&#9;Headers:    map[string]string{&quot;Content-Type&quot;: &quot;application/json&quot;},&#10;&#9;&#9;Body:       `{&quot;error&quot;: &quot;Not Found&quot;}`,&#10;&#9;}, nil&#10;}&#10;&#10;func main() {&#10;&#9;lambda.Start(handler)&#10;}&#10;" />
+              <option name="updatedContent" value="package main&#10;&#10;import (&#10;&#9;&quot;awesomeProject1/app/application&quot;&#10;&#9;&quot;awesomeProject1/app/infrastructure&quot;&#10;&#9;&quot;context&quot;&#10;&#9;&quot;encoding/json&quot;&#10;&#9;&quot;github.com/aws/aws-lambda-go/events&quot;&#10;&#9;&quot;github.com/aws/aws-lambda-go/lambda&quot;&#10;&#9;&quot;github.com/aws/aws-sdk-go-v2/aws&quot;&#10;&#9;&quot;github.com/aws/aws-sdk-go-v2/config&quot;&#10;&#9;&quot;github.com/aws/aws-sdk-go-v2/service/sns&quot;&#10;&#9;&quot;log&quot;&#10;)&#10;&#10;var eventService *application.EventService&#10;&#10;func init() {&#10;&#9;cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(&quot;us-east-1&quot;))&#10;&#9;if err != nil {&#10;&#9;&#9;log.Fatalf(&quot;failed to load configuration, %v&quot;, err)&#10;&#9;}&#10;&#10;&#9;snsClient := sns.NewFromConfig(cfg)&#10;&#9;snsPublisher := infrastructure.SNSPublisher{&#10;&#9;&#9;Client:   snsClient,&#10;&#9;&#9;TopicArn: &quot;arn:aws:sns:us-east-1:000000000000:my-topic&quot;, // Replace with your SNS topic ARN&#10;&#9;}&#10;&#9;eventService = &amp;application.EventService{&#10;&#9;&#9;SNSPublisher: snsPublisher,&#10;&#9;}&#10;}&#10;&#10;func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {&#10;&#9;if request.HTTPMethod == &quot;POST&quot; &amp;&amp; request.Path == &quot;/callbacks-trackingagrovarejo/v1/eventos_operacao&quot; {&#10;&#9;&#9;var payload map[string]interface{}&#10;&#9;&#9;err := json.Unmarshal([]byte(request.Body), &amp;payload)&#10;&#9;&#9;if err != nil {&#10;&#9;&#9;&#9;return events.APIGatewayProxyResponse{&#10;&#9;&#9;&#9;&#9;StatusCode: 400,&#10;&#9;&#9;&#9;&#9;Headers:    map[string]string{&quot;Content-Type&quot;: &quot;application/json&quot;},&#10;&#9;&#9;&#9;&#9;Body:       `{&quot;error&quot;: &quot;` + err.Error() + `&quot;}`,&#10;&#9;&#9;&#9;}, nil&#10;&#9;&#9;}&#10;&#10;&#9;&#9;err = eventService.ProcessAndPublishEvent(payload)&#10;&#9;&#9;if err != nil {&#10;&#9;&#9;&#9;return events.APIGatewayProxyResponse{&#10;&#9;&#9;&#9;&#9;StatusCode: 500,&#10;&#9;&#9;&#9;&#9;Headers:    map[string]string{&quot;Content-Type&quot;: &quot;application/json&quot;},&#10;&#9;&#9;&#9;&#9;Body:       `{&quot;error&quot;: &quot;` + err.Error() + `&quot;}`,&#10;&#9;&#9;&#9;}, nil&#10;&#9;&#9;}&#10;&#10;&#9;&#9;return events.APIGatewayProxyResponse{&#10;&#9;&#9;&#9;StatusCode: 200,&#10;&#9;&#9;&#9;Headers:    map[string]string{&quot;Content-Type&quot;: &quot;application/json&quot;},&#10;&#9;&#9;&#9;Body:       `{&quot;message&quot;: &quot;Event processed and published successfully&quot;}`,&#10;&#9;&#9;}, nil&#10;&#9;}&#10;&#9;return events.APIGatewayProxyResponse{&#10;&#9;&#9;StatusCode: 404,&#10;&#9;&#9;Headers:    map[string]string{&quot;Content-Type&quot;: &quot;application/json&quot;},&#10;&#9;&#9;Body:       `{&quot;error&quot;: &quot;Not Found&quot;}`,&#10;&#9;}, nil&#10;}&#10;&#10;func main() {&#10;&#9;lambda.Start(handler)&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/cmd/lambda/main.go">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/cmd/lambda/main.go" />
+              <option name="originalContent" value="package main&#10;&#10;import (&#10;&#9;adapterin &quot;awesomeProject1/internal/adapter/in&quot;&#10;&#9;adapterout &quot;awesomeProject1/internal/adapter/out&quot;&#10;&#9;&quot;awesomeProject1/internal/core&quot;&#10;&#9;&quot;github.com/aws/aws-sdk-go/aws/session&quot;&#10;&#9;&quot;os&quot;&#10;)&#10;&#10;func main() {&#10;&#9;topicArn := os.Getenv(&quot;SNS_TOPIC_ARN&quot;)&#10;&#9;sess := session.Must(session.NewSession())&#10;&#9;snsPublisher := adapterout.NewSNSPublisher(sess, topicArn)&#10;&#9;service := core.NewService(snsPublisher)&#10;&#9;adapterin.StartLambda(service)&#10;}&#10;" />
+              <option name="updatedContent" value="package main&#10;&#10;import (&#10;&#9;adapterin &quot;awesomeProject1/internal/adapter/in&quot;&#10;&#9;adapterout &quot;awesomeProject1/internal/adapter/out&quot;&#10;&#9;&quot;awesomeProject1/internal/core&quot;&#10;&#9;&quot;github.com/aws/aws-sdk-go-v2/config&quot;&#10;&#9;&quot;os&quot;&#10;&#9;&quot;context&quot;&#10;)&#10;&#10;func main() {&#10;&#9;topicArn := os.Getenv(&quot;SNS_TOPIC_ARN&quot;)&#10;&#9;cfg, err := config.LoadDefaultConfig(context.Background())&#10;&#9;if err != nil {&#10;&#9;&#9;panic(err)&#10;&#9;}&#10;&#9;snsPublisher := adapterout.NewSNSPublisher(cfg, topicArn)&#10;&#9;service := core.NewService(snsPublisher)&#10;&#9;adapterin.StartLambda(service)&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/docker-compose.yml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/docker-compose.yml" />
+              <option name="updatedContent" value="version: '3.8'&#10;services:&#10;  localstack:&#10;    image: localstack/localstack:3.4&#10;    environment:&#10;      - SERVICES=lambda,apigateway&#10;      - DEBUG=1&#10;      - LAMBDA_EXECUTOR=docker&#10;      - DOCKER_HOST=unix:///var/run/docker.sock&#10;      - AWS_DEFAULT_REGION=us-east-1&#10;      - AWS_ACCESS_KEY_ID=test&#10;      - AWS_SECRET_ACCESS_KEY=test&#10;    ports:&#10;      - &quot;4566:4566&quot;&#10;      - &quot;4571:4571&quot;&#10;    volumes:&#10;      - &quot;/var/run/docker.sock:/var/run/docker.sock&quot;&#10;      - ./localstack-init:/etc/localstack/init/ready.d&#10;&#10;  lambda:&#10;    build: .&#10;    environment:&#10;      - AWS_REGION=us-east-1&#10;    depends_on:&#10;      - localstack&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/internal/adapter/in/lambda.go">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/internal/adapter/in/lambda.go" />
+              <option name="updatedContent" value="package lambda&#10;&#10;import (&#10;&#9;&quot;context&quot;&#10;&#9;&quot;encoding/json&quot;&#10;&#9;&quot;github.com/aws/aws-lambda-go/events&quot;&#10;&#9;&quot;github.com/aws/aws-lambda-go/lambda&quot;&#10;&#9;&quot;awesomeProject1/internal/core&quot;&#10;)&#10;&#10;type Handler struct {&#10;&#9;Processor core.Processor&#10;}&#10;&#10;func (h *Handler) HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {&#10;&#9;err := h.Processor.Process(ctx, []byte(event.Body))&#10;&#9;if err != nil {&#10;&#9;&#9;return events.APIGatewayProxyResponse{StatusCode: 500, Body: err.Error()}, nil&#10;&#9;}&#10;&#9;return events.APIGatewayProxyResponse{StatusCode: 200, Body: `{&quot;message&quot;:&quot;ok&quot;}`}, nil&#10;}&#10;&#10;func StartLambda(processor core.Processor) {&#10;&#9;h := &amp;Handler{Processor: processor}&#10;&#9;lambda.Start(h.HandleRequest)&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/internal/adapter/out/sns.go">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/internal/adapter/out/sns.go" />
+              <option name="originalContent" value="package out&#10;&#10;import (&#10;&#9;&quot;context&quot;&#10;&#9;&quot;github.com/aws/aws-sdk-go/aws&quot;&#10;&#9;&quot;github.com/aws/aws-sdk-go/aws/session&quot;&#10;&#9;&quot;github.com/aws/aws-sdk-go/service/sns&quot;&#10;)&#10;&#10;type SNSPublisher struct {&#10;&#9;snsClient *sns.SNS&#10;&#9;topicArn  string&#10;}&#10;&#10;func NewSNSPublisher(sess *session.Session, topicArn string) *SNSPublisher {&#10;&#9;return &amp;SNSPublisher{&#10;&#9;&#9;snsClient: sns.New(sess),&#10;&#9;&#9;topicArn:  topicArn,&#10;&#9;}&#10;}&#10;&#10;func (p *SNSPublisher) Publish(ctx context.Context, message string) error {&#10;&#9;_, err := p.snsClient.PublishWithContext(ctx, &amp;sns.PublishInput{&#10;&#9;&#9;Message:  aws.String(message),&#10;&#9;&#9;TopicArn: aws.String(p.topicArn),&#10;&#9;})&#10;&#9;return err&#10;}&#10;" />
+              <option name="updatedContent" value="package out&#10;&#10;import (&#10;&#9;&quot;context&quot;&#10;&#9;&quot;github.com/aws/aws-sdk-go-v2/aws&quot;&#10;&#9;&quot;github.com/aws/aws-sdk-go-v2/config&quot;&#10;&#9;&quot;github.com/aws/aws-sdk-go-v2/service/sns&quot;&#10;)&#10;&#10;type SNSPublisher struct {&#10;&#9;snsClient *sns.Client&#10;&#9;topicArn  string&#10;}&#10;&#10;func NewSNSPublisher(cfg aws.Config, topicArn string) *SNSPublisher {&#10;&#9;return &amp;SNSPublisher{&#10;&#9;&#9;snsClient: sns.NewFromConfig(cfg),&#10;&#9;&#9;topicArn:  topicArn,&#10;&#9;}&#10;}&#10;&#10;func (p *SNSPublisher) Publish(ctx context.Context, message string) error {&#10;&#9;_, err := p.snsClient.Publish(ctx, &amp;sns.PublishInput{&#10;&#9;&#9;Message:  aws.String(message),&#10;&#9;&#9;TopicArn: aws.String(p.topicArn),&#10;&#9;})&#10;&#9;return err&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/internal/core/service.go">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/internal/core/service.go" />
+              <option name="updatedContent" value="package service&#10;&#10;import &quot;context&quot;&#10;&#10;type Processor interface {&#10;&#9;Process(ctx context.Context, payload []byte) error&#10;}&#10;&#10;// Service implements the core business logic&#10;func NewService(snsPublisher SNSPublisher) Processor {&#10;&#9;return &amp;service{snsPublisher: snsPublisher}&#10;}&#10;&#10;type SNSPublisher interface {&#10;&#9;Publish(ctx context.Context, message string) error&#10;}&#10;&#10;type service struct {&#10;&#9;snsPublisher SNSPublisher&#10;}&#10;&#10;func (s *service) Process(ctx context.Context, payload []byte) error {&#10;&#9;// Example: just forward the payload as a string to SNS&#10;&#9;return s.snsPublisher.Publish(ctx, string(payload))&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/internal/port/in/api.go">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/internal/port/in/api.go" />
+              <option name="updatedContent" value="package in&#10;&#10;import &quot;context&quot;&#10;&#10;type APIHandler interface {&#10;&#9;Handle(ctx context.Context, payload []byte) error&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/internal/port/out/sns.go">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/internal/port/out/sns.go" />
+              <option name="updatedContent" value="package out&#10;&#10;import &quot;context&quot;&#10;&#10;type SNSPublisher interface {&#10;&#9;Publish(ctx context.Context, message string) error&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/local-tools/01-setup.sh">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/local-tools/01-setup.sh" />
+              <option name="originalContent" value="#!/bin/bash&#10;set -e&#10;&#10;REGION=&quot;us-east-1&quot;&#10;&#10;pushd ../app&#10;GOOS=linux GOARCH=amd64 go build -o main main.go&#10;zip function.zip main&#10;popd&#10;&#10;SNS_TOPIC_ARN=$(aws sns create-topic --name my-topic --endpoint-url http://localhost:4566 --region $REGION | jq -r .TopicArn)&#10;echo &quot;SNS topic ARN: $SNS_TOPIC_ARN&quot;&#10;&#10;SQS_QUEUE_URL=$(aws sqs create-queue --queue-name my-queue --endpoint-url http://localhost:4566 --region $REGION | jq -r .QueueUrl)&#10;echo &quot;SQS queue URL: $SQS_QUEUE_URL&quot;&#10;&#10;aws sns subscribe \&#10;  --topic-arn $SNS_TOPIC_ARN \&#10;  --protocol sqs \&#10;  --notification-endpoint $SQS_QUEUE_URL \&#10;  --endpoint-url http://localhost:4566 \&#10;  --region $REGION&#10;&#10;aws lambda create-function \&#10;  --function-name my-lambda-function \&#10;  --runtime go1.x \&#10;  --handler main \&#10;  --role arn:aws:iam::000000000000:role/lambda-role \&#10;  --zip-file fileb://../app/function.zip \&#10;  --endpoint-url http://localhost:4566 \&#10;  --region $REGION&#10;&#10;API_ID=$(aws apigateway create-rest-api --name &quot;MyAPI&quot; --endpoint-url http://localhost:4566 --region $REGION | jq -r .id)&#10;PARENT_RESOURCE_ID=$(aws apigateway get-resources --rest-api-id $API_ID --endpoint-url http://localhost:4566 --region $REGION | jq -r .items[0].id)&#10;RESOURCE_ID=$(aws apigateway create-resource --rest-api-id $API_ID --parent-id $PARENT_RESOURCE_ID --path-part callbacks-trackingagrovarejo --endpoint-url http://localhost:4566 --region $REGION | jq -r .id)&#10;RESOURCE_ID2=$(aws apigateway create-resource --rest-api-id $API_ID --parent-id $RESOURCE_ID --path-part v1 --endpoint-url http://localhost:4566 --region $REGION | jq -r .id)&#10;RESOURCE_ID3=$(aws apigateway create-resource --rest-api-id $API_ID --parent-id $RESOURCE_ID2 --path-part eventos_operacao --endpoint-url http://localhost:4566 --region $REGION | jq -r .id)&#10;&#10;aws apigateway put-method --rest-api-id $API_ID --resource-id $RESOURCE_ID3 --http-method POST --authorization-type &quot;NONE&quot; --endpoint-url http://localhost:4566 --region $REGION&#10;aws apigateway put-integration --rest-api-id $API_ID --resource-id $RESOURCE_ID3 --http-method POST --type AWS_PROXY --integration-http-method POST --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:000000000000:function:my-lambda-function/invocations --endpoint-url http://localhost:4566 --region $REGION&#10;aws lambda add-permission --function-name my-lambda-function --statement-id apigateway-test-2 --action lambda:InvokeFunction --principal apigateway.amazonaws.com --source-arn arn:aws:execute-api:$REGION:000000000000:$API_ID/*/POST/callbacks-trackingagrovarejo/v1/eventos_operacao --endpoint-url http://localhost:4566 --region $REGION&#10;aws apigateway create-deployment --rest-api-id $API_ID --stage-name dev --endpoint-url http://localhost:4566 --region $REGION&#10;&#10;echo &quot;API endpoint: http://localhost:4566/restapis/$API_ID/dev/_user_request_/callbacks-trackingagrovarejo/v1/eventos_operacao&quot;&#10;" />
+              <option name="updatedContent" value="#!/bin/bash&#10;set -e&#10;&#10;REGION=&quot;us-east-1&quot;&#10;&#10;pushd ../app&#10;GOOS=linux GOARCH=amd64 go build -o main main.go&#10;zip function.zip main&#10;popd&#10;&#10;SNS_TOPIC_ARN=$(aws sns create-topic --name my-topic --endpoint-url http://localhost:4566 --region $REGION | jq -r .TopicArn)&#10;echo &quot;SNS topic ARN: $SNS_TOPIC_ARN&quot;&#10;&#10;SQS_QUEUE_URL=$(aws sqs create-queue --queue-name my-queue --endpoint-url http://localhost:4566 --region $REGION | jq -r .QueueUrl)&#10;echo &quot;SQS queue URL: $SQS_QUEUE_URL&quot;&#10;&#10;SQS_QUEUE_ARN=$(aws sqs get-queue-attributes --queue-url $SQS_QUEUE_URL --attribute-names QueueArn --endpoint-url http://localhost:4566 --region $REGION | jq -r .Attributes.QueueArn)&#10;echo &quot;SQS queue ARN: $SQS_QUEUE_ARN&quot;&#10;&#10;aws sns subscribe \&#10;  --topic-arn $SNS_TOPIC_ARN \&#10;  --protocol sqs \&#10;  --notification-endpoint $SQS_QUEUE_ARN \&#10;  --endpoint-url http://localhost:4566 \&#10;  --region $REGION&#10;&#10;aws lambda create-function \&#10;  --function-name my-lambda-function \&#10;  --runtime go1.x \&#10;  --handler main \&#10;  --role arn:aws:iam::000000000000:role/lambda-role \&#10;  --zip-file fileb://../app/function.zip \&#10;  --endpoint-url http://localhost:4566 \&#10;  --region $REGION&#10;&#10;API_ID=$(aws apigateway create-rest-api --name &quot;MyAPI&quot; --endpoint-url http://localhost:4566 --region $REGION | jq -r .id)&#10;PARENT_RESOURCE_ID=$(aws apigateway get-resources --rest-api-id $API_ID --endpoint-url http://localhost:4566 --region $REGION | jq -r .items[0].id)&#10;RESOURCE_ID=$(aws apigateway create-resource --rest-api-id $API_ID --parent-id $PARENT_RESOURCE_ID --path-part callbacks-trackingagrovarejo --endpoint-url http://localhost:4566 --region $REGION | jq -r .id)&#10;RESOURCE_ID2=$(aws apigateway create-resource --rest-api-id $API_ID --parent-id $RESOURCE_ID --path-part v1 --endpoint-url http://localhost:4566 --region $REGION | jq -r .id)&#10;RESOURCE_ID3=$(aws apigateway create-resource --rest-api-id $API_ID --parent-id $RESOURCE_ID2 --path-part eventos_operacao --endpoint-url http://localhost:4566 --region $REGION | jq -r .id)&#10;&#10;aws apigateway put-method --rest-api-id $API_ID --resource-id $RESOURCE_ID3 --http-method POST --authorization-type &quot;NONE&quot; --endpoint-url http://localhost:4566 --region $REGION&#10;aws apigateway put-integration --rest-api-id $API_ID --resource-id $RESOURCE_ID3 --http-method POST --type AWS_PROXY --integration-http-method POST --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:000000000000:function:my-lambda-function/invocations --endpoint-url http://localhost:4566 --region $REGION&#10;aws lambda add-permission --function-name my-lambda-function --statement-id apigateway-test-2 --action lambda:InvokeFunction --principal apigateway.amazonaws.com --source-arn arn:aws:execute-api:$REGION:000000000000:$API_ID/*/POST/callbacks-trackingagrovarejo/v1/eventos_operacao --endpoint-url http://localhost:4566 --region $REGION&#10;aws apigateway create-deployment --rest-api-id $API_ID --stage-name dev --endpoint-url http://localhost:4566 --region $REGION&#10;&#10;echo &quot;API endpoint: http://localhost:4566/restapis/$API_ID/dev/_user_request_/callbacks-trackingagrovarejo/v1/eventos_operacao&quot;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/local-tools/02-apicall.sh">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/local-tools/02-apicall.sh" />
+              <option name="originalContent" value="curl --request POST \&#10;  --url http://localhost:4566/restapis/wdfxhnu0lt/dev/_user_request_/callbacks-trackingagrovarejo/v1/eventos_operacao \&#10;  --header 'content-type: application/json' \&#10;  --data '{&#10;  &quot;foo&quot;: &quot;bar&quot;&#10;}'&#10;&#10;awslocal sqs receive-message --queue-url http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/my-queue --region us-east-1" />
+              <option name="updatedContent" value="#!/bin/bash&#10;set -e&#10;&#10;REGION=&quot;us-east-1&quot;&#10;ENDPOINT_URL=&quot;http://localhost:4566&quot;&#10;&#10;# Fetch the API Gateway ID dynamically&#10;GATEWAY_ID=$(aws apigateway get-rest-apis --endpoint-url $ENDPOINT_URL --region $REGION | jq -r '.items[0].id')&#10;echo &quot;Using API Gateway ID: $GATEWAY_ID&quot;&#10;&#10;# Make the API call&#10;curl --request POST \&#10;  --url $ENDPOINT_URL/restapis/$GATEWAY_ID/dev/_user_request_/callbacks-trackingagrovarejo/v1/eventos_operacao \&#10;  --header 'content-type: application/json' \&#10;  --data '{&#10;  &quot;foo&quot;: &quot;bar&quot;&#10;}'&#10;&#10;# Check messages in the SQS queue&#10;awslocal sqs receive-message --queue-url http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/my-queue --region $REGION" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/localstack-init/01-setup.sh">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/localstack-init/01-setup.sh" />
+              <option name="updatedContent" value="#!/bin/bash&#10;set -e&#10;&#10;# Create Lambda function in LocalStack&#10;awslocal lambda create-function \&#10;  --function-name my-lambda-function \&#10;  --runtime go1.x \&#10;  --handler main \&#10;  --role arn:aws:iam::000000000000:role/lambda-role \&#10;  --zip-file fileb:///var/task/main&#10;&#10;# Create API Gateway and integrate with Lambda&#10;API_ID=$(awslocal apigateway create-rest-api --name &quot;MyAPI&quot; | jq -r .id)&#10;PARENT_RESOURCE_ID=$(awslocal apigateway get-resources --rest-api-id $API_ID | jq -r .items[0].id)&#10;RESOURCE_ID=$(awslocal apigateway create-resource --rest-api-id $API_ID --parent-id $PARENT_RESOURCE_ID --path-part callbacks-trackingagrovarejo | jq -r .id)&#10;RESOURCE_ID2=$(awslocal apigateway create-resource --rest-api-id $API_ID --parent-id $RESOURCE_ID --path-part v1 | jq -r .id)&#10;RESOURCE_ID3=$(awslocal apigateway create-resource --rest-api-id $API_ID --parent-id $RESOURCE_ID2 --path-part eventos_operacao | jq -r .id)&#10;&#10;awslocal apigateway put-method --rest-api-id $API_ID --resource-id $RESOURCE_ID3 --http-method POST --authorization-type &quot;NONE&quot;&#10;awslocal apigateway put-integration --rest-api-id $API_ID --resource-id $RESOURCE_ID3 --http-method POST --type AWS_PROXY --integration-http-method POST --uri arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:000000000000:function:my-lambda-function/invocations&#10;awslocal lambda add-permission --function-name my-lambda-function --statement-id apigateway-test-2 --action lambda:InvokeFunction --principal apigateway.amazonaws.com --source-arn arn:aws:execute-api:us-east-1:000000000000:$API_ID/*/POST/callbacks-trackingagrovarejo/v1/eventos_operacao&#10;awslocal apigateway create-deployment --rest-api-id $API_ID --stage-name dev&#10;&#10;echo &quot;API endpoint: http://localhost:4566/restapis/$API_ID/dev/_user_request_/callbacks-trackingagrovarejo/v1/eventos_operacao&quot;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
