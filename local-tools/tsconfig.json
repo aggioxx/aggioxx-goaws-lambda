@@ -1,0 +1,18 @@
+{
+  "event_type": "",
+  "user_id": "",
+  "garantia_id": "",
+  "proposta_id": "",
+  "etapa": "",
+  "status": "",
+  "timestamp": "",
+  "metadata": {
+    "user_agent": "",
+    "ip_address": "",
+    "location": {
+      "country": "",
+      "region": "",
+      "city": ""
+    }
+  }
+}

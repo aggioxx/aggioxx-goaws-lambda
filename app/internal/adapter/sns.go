@@ -1,7 +1,6 @@
 package adapter
 
 import (
-	"awesomeProject1/internal/domain/model"
 	"context"
 	"encoding/json"
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -13,8 +12,8 @@ type SNSPublisher struct {
 	TopicArn string
 }
 
-func (p *SNSPublisher) Publish(event model.Event) error {
-	message, err := json.Marshal(event)
+func (p *SNSPublisher) PublishEvent(eventType string, payload map[string]interface{}) error {
+	message, err := json.Marshal(payload)
 	if err != nil {
 		return err
 	}

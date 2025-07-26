@@ -1,0 +1,14 @@
+{
+  "idPessoaFisica": "",
+  "idPessoaJuridica": "",
+  "numeroContrato": "",
+  "isMultiplosContratos": false,
+  "idTipoContrato": "",
+  "metadata": {
+    "id": "1234567890",
+    "nome": "Teste de Payloads",
+    "descricao": "Payloads para testes automatizados",
+    "dataCriacao": "2023-10-01T12:00:00Z",
+    "dataAtualizacao": "2023-10-01T12:00:00Z"
+  }
+}

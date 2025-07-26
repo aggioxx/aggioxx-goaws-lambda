@@ -3,9 +3,9 @@ set -e
 
 REGION="us-east-1"
 
-pushd ../app
-GOOS=linux GOARCH=amd64 go build -o main main.go
-zip function.zip main
+pushd ../app/cmd
+GOOS=linux GOARCH=amd64 go build -o ../main
+zip ../function.zip ../main
 popd
 
 SNS_TOPIC_ARN=$(aws sns create-topic --name my-topic --endpoint-url http://localhost:4566 --region $REGION | jq -r .TopicArn)
